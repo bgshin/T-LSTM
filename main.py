@@ -30,7 +30,7 @@ def generate_split(input, target, elapse_time, cell_len):
     Train_data = []
     Test_data = []
     Train_labels = []
-    Test_labels = []
+    Test_labels = [][k.shape[1] for k in np.array(data_test_batches)]
     Train_time = []
     Test_time = []
     for i in range(cell_len):
@@ -45,7 +45,7 @@ def generate_split(input, target, elapse_time, cell_len):
            Test_data.append(data[split:N])
            Train_labels.append(label[1:split])
            Test_labels.append(label[split:N])
-           Train_time.append(time[1:split])
+           Train_time.append(time[1:split])fn
            Test_time.append(time[split:N])
         else:
            Train_data.append(data)
@@ -73,15 +73,16 @@ def main(argv):
 
 
     # set learning parameters
+    #  50 1028 512 2 0.6
     learning_rate = 1e-3
-    training_epochs = int(sys.argv[1])
+    training_epochs = 50
 
     # set network parameters
     input_dim = data_train_batches[0].shape[2]
-    hidden_dim = int(sys.argv[2])
-    fc_dim = int(sys.argv[3])
-    output_dim = int(sys.argv[4]) # Binary labels
-    train_dropout_prob = float(sys.argv[5])
+    hidden_dim = 1028
+    fc_dim = 512
+    output_dim = 2 # Binary labels
+    train_dropout_prob = 0.6
 
 
     lstm = T_LSTM(input_dim, output_dim, hidden_dim, fc_dim)
@@ -98,7 +99,9 @@ def main(argv):
         for epoch in range(training_epochs):#
             # Loop over all batches
             total_cost = 0
+            print 'epoch {}/50'.format(epoch)
             for i in range(number_train_batches):#
+                print 'batch{}/{}'.format(i, number_train_batches)
                 # batch_xs is [number of patients x sequence length x input dimensionality]
                 batch_xs, batch_ys, batch_ts = data_train_batches[i], labels_train_batches[i], elapsed_train_batches[i]
                 batch_ts = np.reshape(batch_ts, [batch_ts.shape[0],batch_ts.shape[2]])
@@ -107,6 +110,7 @@ def main(argv):
                 total_cost += cost
 
             Cost[epoch] = total_cost / number_train_batches
+            print Cost[epoch]
 
         print("Optimization is over!")
 
